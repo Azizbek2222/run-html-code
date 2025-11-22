@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AdsGram Reklama</title>
+
+    <!-- AdsGram SDK -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+    <script>
+        // Reklama tayyorlash
+        let AdController;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            AdController = window.Adsgram.init({
+                blockId: "int-17980"  // <<< shu yerga blockId qo‘y!
+            });
+        });
+
+        // Tugma bosilganda reklama chiqarish funksiyasi
+        function showAd() {
+            if (!AdController) {
+                alert("Reklama hali yuklanmadi!");
+                return;
+            }
+
+            AdController.show()
+            .then(result => {
+                console.log("Reklama tugadi:", result);
+                alert("Reklama ko‘rildi!");
+            })
+            .catch(error => {
+                console.log("Reklama xatosi:", error);
+                alert("Reklama ochilmadi.");
+            });
+        }
+    </script>
+
+    <style>
+        button{
+            padding: 12px 18px;
+            background: #0088ff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>AdsGram Reklama Test</h2>
+
+    <button onclick="showAd()">Reklamani ko‘rsat</button>
+
+</body>
+</html>
