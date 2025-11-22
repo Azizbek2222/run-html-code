@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdsGram reklama</title>
+    <!-- AdsGram SDK scriptini ulash -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+</head>
+<body>
+    <h2>AdsGram reklama tugmasi</h2>
+    <button id="showAdBtn">Reklamani ko‘rsat</button>
+
+    <script>
+        // AdsGram SDKni ishga tushirish (Rewarded va Interstitial uchun)
+        const AdController = window.Adsgram.init({
+            blockId: "int-17980" // bu yerga o'zingizning blockId yozasiz
+        });
+
+        // Tugma bosilganda reklama ko‘rsatish
+        document.getElementById("showAdBtn").addEventListener("click", function() {
+            AdController.show()
+                .then((result) => {
+                    // Agar foydalanuvchi reklamani oxirigacha ko‘rsa yoki Interstitialni yopsa
+                    console.log("Reklama ko‘rildi:", result);
+                    alert("Reklama ko‘rildi, foydalanuvchini mukofotlash mumkin!");
+                })
+                .catch((error) => {
+                    // Agar reklama ko‘rinmasa yoki xatolik bo‘lsa
+                    console.error("Reklama xatoligi:", error);
+                    alert("Reklama chiqmadi yoki xatolik yuz berdi.");
+                });
+        });
+    </script>
+</body>
+</html>
