@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Musiqa Qidiruv Ilovasi</title>
+
+    <!-- Adexium -->
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            const adexiumWidget = new AdexiumWidget({
+                wid: '073de845-2e9b-4e86-b29a-44ad597d21b1', // Sizning wid
+                adFormat: 'push-like'
+            });
+            adexiumWidget.autoMode(); // Avtomatik reklama ko'rsatish
+            window.adexium = adexiumWidget; // global qilib qo'yamiz
+        } catch (e) {
+            console.log("Adexium error:", e);
+        }
+    });
+    </script>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #f0f4f7, #d9e2ec);
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4a90e2;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 80%;
+            max-width: 400px;
+            padding: 10px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+        .music-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 50px;
+        }
+        .music-item {
+            width: 90%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+            position: relative; /* Reklama joylash uchun */
+        }
+        .music-item:hover {
+            transform: scale(1.03);
+        }
+        .music-name {
+            font-size: 1.1em;
+            color: #333;
+        }
+        .download-btn {
+            background-color: #4a90e2;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .download-btn:hover {
+            background-color: #357ABD;
+        }
+        .ad-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+        }
+        @media (max-width: 500px) {
+            .music-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .download-btn {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>Musiqa Qidiruv Ilovasi</header>
+
+    <div class="search-box">
+        <input type="text" id="search" placeholder="Musiqa nomini kiriting...">
+    </div>
+
+    <div class="music-list" id="music-list">
+        <!-- Musiqalar va reklama bu yerda chiqadi -->
+    </div>
+
+    <script>
+        const musics = [
+            {name: "TRALALERO PORRADEIRO (Super Slowed)", link: "https://drive.google.com/file/d/1alWCBYHw7yBWFlHSnpVPPy-gjM7mNCFj/view?usp=drivesdk"},
+            {name: "Golden Brown (Slowed Down Version)", link: "https://drive.google.com/file/d/1ecd85RcmaxNS8UNuDD0bNmjIbg_Eb1IS/view?usp=drivesdk"},
+            {name: "Sonne", link: "https://drive.google.com/file/d/1OhdWfx1gkQ9Zxhumr_XoC2yqEOukwcgD/view?usp=drivesdk"},
+            {name: "SKORN - Slowed", link: "https://drive.google.com/file/d/1riucgmZqBfUgLyc6v25HgdJuSUCXlypw/view?usp=drivesdk"},
+            {name: "Гио_Пика_Черный_Дельфин_Slow", link: "https://drive.google.com/file/d/1DYNy-hJP24HySJjHLYjO3v53CAp-ewlz/view?usp=drivesdk"},
+            {name: "снова ноч", link: "https://drive.google.com/file/d/1GH5EU-Xc5OhHkFHq9DkXUm1Alic9e-4W/view?usp=drivesdk"},
+            {name: "Ummon - Xiyonat", link: "https://drive.google.com/file/d/1zl_tXGL9H1ixc7bTdsSlmNxxO-flHmYu/view?usp=drivesdk"},
+            {name: "𝓓𝓮𝓮𝓹𝓓𝓸𝔀𝓷_Andrew_Tate_Theme_Song_slowed", link: "https://drive.google.com/file/d/1u8fsCgXm8NbRO7lWDkCjOAKqMy2EbSBa/view?usp=drivesdk"},
+            {name: "18 yoshimda edi", link: "https://drive.google.com/file/d/1odZ5KT2TuNJAiuLmZHKHRlhY2A7GHCGn/view?usp=drivesdk"},
+            {name: "PAPI DE MI VIDA PAPI AMOR FUNK 2 (Ultra Slowed)", link: "https://drive.google.com/file/d/1VIp8Dbov40f3nfkxwjphEzSNpbGw3MH6/view?usp=drivesdk"},
+        ];
+
+        const searchInput = document.getElementById('search');
+        const musicList = document.getElementById('music-list');
+
+        function displayMusics(filteredMusics) {
+            musicList.innerHTML = '';
+            filteredMusics.forEach((music, index) => {
+                const musicItem = document.createElement('div');
+                musicItem.className = 'music-item';
+                musicItem.innerHTML = `
+                    <div class="music-name">${music.name}</div>
+                    <a href="${music.link}" class="download-btn" target="_blank">Yuklab olish</a>
+                `;
+                musicList.appendChild(musicItem);
+
+                // Adexium push-like reklama
+                if(window.adexium) {
+                    const adDiv = document.createElement('div');
+                    adDiv.className = 'ad-container';
+                    musicItem.appendChild(adDiv);
+                    window.adexium.show({element: adDiv});
+                }
+            });
+        }
+
+        // Dastlab barcha musiqalarni ko‘rsatish
+        displayMusics(musics);
+
+        // Qidiruv
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            const filtered = musics.filter(music => music.name.toLowerCase().includes(query));
+            displayMusics(filtered.length ? filtered : musics);
+        });
+    </script>
+
+</body>
+  </html>
