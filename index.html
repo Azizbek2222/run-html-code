@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Code Snip Editor</title>
+    <title>GitHub Code Snip Editor (Firebase)</title>
     <link rel="stylesheet" href="style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script> 
 </head>
 <body>
 
     <header>
-        <h1>HTML Snip Muharriri</h1>
-        <p>Kodni yozing, ishga tushiring va URL orqali ulashing!</p>
+        <h1>HTML Snip Muharriri (Firebase orqali ulashish)</h1>
+        <p>Kodni yozing, ishga tushiring, Firebase'ga saqlang va ulashing!</p>
     </header>
 
     <div class="container">
@@ -23,7 +26,7 @@
                 <input type="file" id="file-input" style="display: none;" onchange="loadFile(event)">
                 <button onclick="document.getElementById('file-input').click()">📁 Fayldan yuklash</button>
                 
-                <button onclick="getShareLink()">🔗 Havolani olish/Nusxalash</button>
+                <button onclick="saveAndGetFirebaseLink()">💾 Save & Get Link</button>
             </div>
             <input type="text" id="share-link-output" placeholder="Ulashish havolasi shu yerda paydo bo'ladi" readonly style="margin-top: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; display: none;">
         </div>
