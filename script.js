@@ -1,6 +1,11 @@
 const editor = document.getElementById('code-editor');
 const resultIframe = document.getElementById('result-iframe');
 const shareLinkOutput = document.getElementById('share-link-output');
+const container = document.querySelector('.container');
+const header = document.querySelector('header');
+const editorPanel = document.querySelector('.panel.editor');
+const resultPanel = document.querySelector('.panel.result');
+
 
 // --- 1. Kodni ishga tushirish funksiyasi ---
 function runCode() {
@@ -8,25 +13,51 @@ function runCode() {
     resultIframe.srcdoc = code;
 }
 
-// --- 2. URL manzilidagi kodni o'qish va yuklash funksiyasi ---
+// --- 2. URL manzilidagi kodni o'qish va yuklash funksiyasi (Yangilangan) ---
 function loadCodeFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isRunMode = urlParams.get('run') === 'true'; // ?run=true parametrini tekshirish
+
     if (window.location.hash) {
         try {
             const encoded = window.location.hash.substring(1);
-            
-            // Base64 dan decode (ochish)
             const decodedCode = atob(encoded);
 
+            if (isRunMode) {
+                // Toza Natija Rejimi: Faqat natijani ko'rsatish
+                editorPanel.style.display = 'none'; // Muharrirni yashirish
+                header.style.display = 'none'; // Sarlavhani yashirish
+                
+                // Natija maydonini to'liq ekranga yoyish
+                resultPanel.style.width = '100vw'; 
+                resultPanel.style.height = '100vh';
+                resultPanel.style.margin = '0';
+                resultPanel.style.borderRadius = '0';
+                resultPanel.style.boxShadow = 'none';
+                container.style.gap = '0';
+                container.style.margin = '0';
+                container.style.maxWidth = 'none';
+
+                // Natija sarlavhasini ham yashirish (agar kerak bo'lsa, CSSda ham to'g'rilash mumkin)
+                resultPanel.querySelector('h2').style.display = 'none';
+
+                // Kodni to'g'ridan-to'g'ri butun brauzer oynasiga yuklash
+                document.body.innerHTML = decodedCode;
+
+                // Muharrirga yuklashni o'chirib qo'yamiz, chunki butun sahifa o'zgaradi
+                return; 
+            }
+
+            // Tahrirlash Rejimi: Kodni muharrirga yuklash
             editor.value = decodedCode;
             runCode();
             
             console.log("Kod URL orqali muvaffaqiyatli yuklandi.");
         } catch (e) {
             console.error("Kodni decode qilishda xatolik yuz berdi:", e);
-            // alert("Ushbu havola yaroqsiz kodni o'z ichiga olgan."); // Agar xohlamasangiz, bu qatorni o'chirishingiz mumkin
         }
     } else {
-        // Agar havola bo'sh bo'lsa, muharrirga namuna kodni yuklash
+        // Havola bo'sh bo'lsa, namuna kodni yuklash
         editor.value = `<h1>Salom, Bu mening HTML Snip Loyiham!</h1>
 <p>Natijani ko'rish uchun "Run"ni bosing.</p>
 <style>
@@ -39,27 +70,26 @@ function loadCodeFromUrl() {
     }
 }
 
-// --- 3. Ulashish uchun havola yaratish funksiyasi (Tuzatilgan) ---
+// --- 3. Ulashish uchun havola yaratish funksiyasi (Yangilangan) ---
 function getShareLink() {
     const code = editor.value;
     const encoded = btoa(code);
     
-    // Yangi URL manzilini # belgisidan keyin kodlangan ma'lumot bilan yaratish
-    const newUrl = `${window.location.origin}${window.location.pathname}#${encoded}`;
+    // Natija rejimini ishga tushirish uchun ?run=true parametrini qo'shib, URL yaratish
+    const newUrl = `${window.location.origin}${window.location.pathname}?run=true#${encoded}`;
 
-    // Brauzer manzil satrini yangilash
+    // Brauzer manzil satrini yangilash (Bu faqat muharrir rejimida qulay bo'lishi uchun)
     window.history.pushState(null, '', newUrl);
 
     // Havolani kiritish maydoniga joylash
     shareLinkOutput.value = newUrl;
-    shareLinkOutput.style.display = 'block'; // Maydonni ko'rsatish
+    shareLinkOutput.style.display = 'block'; 
     
     // Modern Clipboard API yordamida nusxalash
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(newUrl).then(() => {
-            alert("✅ Ulashish havolasi yaratildi va nusxalandi! Manzil satrida ham mavjud.");
+            alert("✅ Ulashish havolasi yaratildi va nusxalandi! Endi u faqat natijani ko'rsatadi.");
         }).catch(err => {
-            // Agar nusxalashda xato bo'lsa (xavfsizlik cheklovlari)
             console.error('Nusxalashda xatolik yuz berdi (Clipboard API):', err);
             shareLinkOutput.select();
             document.execCommand('copy');
@@ -70,7 +100,7 @@ function getShareLink() {
         shareLinkOutput.select();
         try {
             document.execCommand('copy');
-            alert("✅ Ulashish havolasi yaratildi va nusxalandi! Manzil satrida ham mavjud.");
+            alert("✅ Ulashish havolasi yaratildi va nusxalandi! Endi u faqat natijani ko'rsatadi.");
         } catch (err) {
             alert("🔗 Havola yaratildi. Uni pastdagi maydondan qo'lda nusxalang yoki manzil satrini ishlating.");
         }
@@ -87,15 +117,12 @@ function loadFile(event) {
 
     const reader = new FileReader();
     
-    // Fayl o'qib bo'lingach
     reader.onload = (e) => {
-        // Muharrirga fayl ichidagi matnni joylash
         editor.value = e.target.result;
-        runCode(); // Koddni darhol ishga tushirish
+        runCode(); 
         alert(`"${file.name}" fayli muvaffaqiyatli yuklandi.`);
     };
 
-    // Faylni matn sifatida o'qish
     reader.readAsText(file);
 }
 
