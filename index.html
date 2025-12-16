@@ -1,25 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
 <meta charset="UTF-8">
 <title>HTML Run App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase.js"></script>
 
+<style>
+*{
+  box-sizing:border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body{
+  min-height:100vh;
+  margin:0;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+}
+
+.app{
+  width:95%;
+  max-width:700px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.4);
+}
+
+h2{
+  margin-top:0;
+  text-align:center;
+}
+
+textarea{
+  width:100%;
+  height:160px;
+  border-radius:12px;
+  border:none;
+  padding:15px;
+  font-size:14px;
+  resize:none;
+  outline:none;
+}
+
+button{
+  width:100%;
+  margin-top:15px;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  background: linear-gradient(135deg,#00f260,#0575e6);
+  color:#fff;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.03);
+  box-shadow:0 0 15px rgba(0,242,96,0.6);
+}
+
+#link{
+  text-align:center;
+  margin-top:15px;
+  word-break:break-all;
+}
+
+#link a{
+  color:#00ffcc;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+hr{
+  border:none;
+  height:1px;
+  background: rgba(255,255,255,0.2);
+  margin:25px 0;
+}
+
+#result{
+  background: rgba(0,0,0,0.35);
+  padding:15px;
+  border-radius:12px;
+  min-height:80px;
+}
+</style>
+
 </head>
 <body>
 
-<h2>HTML yozing</h2>
+<div class="app">
+  <h2>🚀 HTML Run App</h2>
 
-<textarea id="code" style="width:100%;height:150px;"></textarea><br><br>
-<button onclick="save()">RUN + LINK</button>
+  <textarea id="code" placeholder="HTML kodni shu yerga yozing..."></textarea>
+  <button onclick="save()">▶ RUN & LINK</button>
 
-<p id="link"></p>
+  <p id="link"></p>
 
-<hr>
-<h2>Natija</h2>
-<div id="result"></div>
+  <hr>
+
+  <h2>📤 Natija</h2>
+  <div id="result"></div>
+</div>
 
 <script>
 var firebaseConfig = {
