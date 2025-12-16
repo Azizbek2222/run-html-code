@@ -39,7 +39,7 @@ function loadCodeFromUrl() {
     }
 }
 
-// --- 3. Ulashish uchun havola yaratish funksiyasi (Yaxshilangan) ---
+// --- 3. Ulashish uchun havola yaratish funksiyasi (Tuzatilgan) ---
 function getShareLink() {
     const code = editor.value;
     const encoded = btoa(code);
@@ -50,21 +50,35 @@ function getShareLink() {
     // Brauzer manzil satrini yangilash
     window.history.pushState(null, '', newUrl);
 
-    // Havolani kiritish maydoniga joylash va nusxalash
+    // Havolani kiritish maydoniga joylash
     shareLinkOutput.value = newUrl;
     shareLinkOutput.style.display = 'block'; // Maydonni ko'rsatish
-    shareLinkOutput.select(); // Havolani tanlash
-
-    try {
-        document.execCommand('copy'); // Nusxalash
-        alert("🔗 Ulashish havolasi yaratildi va manzil satriga o'rnatildi. Havola avtomatik nusxalandi!");
-    } catch (err) {
-        alert("🔗 Ulashish havolasi yaratildi, lekin nusxalashda xatolik yuz berdi. Manzil satridan qo'lda nusxalang.");
+    
+    // Modern Clipboard API yordamida nusxalash
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(newUrl).then(() => {
+            alert("✅ Ulashish havolasi yaratildi va nusxalandi! Manzil satrida ham mavjud.");
+        }).catch(err => {
+            // Agar nusxalashda xato bo'lsa (xavfsizlik cheklovlari)
+            console.error('Nusxalashda xatolik yuz berdi (Clipboard API):', err);
+            shareLinkOutput.select();
+            document.execCommand('copy');
+            alert("🔗 Havola yaratildi. Uni pastdagi maydondan qo'lda nusxalang yoki manzil satrini ishlating.");
+        });
+    } else {
+        // Eski brauzerlar uchun zaxira usuli
+        shareLinkOutput.select();
+        try {
+            document.execCommand('copy');
+            alert("✅ Ulashish havolasi yaratildi va nusxalandi! Manzil satrida ham mavjud.");
+        } catch (err) {
+            alert("🔗 Havola yaratildi. Uni pastdagi maydondan qo'lda nusxalang yoki manzil satrini ishlating.");
+        }
     }
 }
 
 
-// --- 4. Telefon/Kompyuter faylidan kodni yuklash funksiyasi (Yangi) ---
+// --- 4. Telefon/Kompyuter faylidan kodni yuklash funksiyasi ---
 function loadFile(event) {
     const file = event.target.files[0];
     if (!file) {
