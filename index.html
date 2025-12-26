@@ -1,103 +1,94 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<title>Firebase Link Shortener Demo</title>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<meta charset="UTF-8" />
+<title>HTML → Real Link (GitHub Pages)</title>
 <style>
-body { font-family: Arial; padding: 20px; background: #f5f5f5; }
-h2 { color: #333; }
-input { width: 70%; padding: 10px; margin-right: 5px; border-radius: 5px; border: 1px solid #ccc; }
-button { padding: 10px 15px; border-radius: 5px; border: none; cursor: pointer; background: #007bff; color: #fff; }
-button:hover { background: #0056b3; }
-#result { margin-top: 20px; font-size: 16px; }
-a { color: #007bff; text-decoration: none; }
-a:hover { text-decoration: underline; }
+  body{font-family:sans-serif;background:#0f172a;color:#e5e7eb;padding:20px}
+  textarea{width:100%;height:220px;border-radius:8px;padding:10px}
+  input,button{padding:10px;border-radius:8px;border:none}
+  button{background:#22c55e;color:#052e16;cursor:pointer}
+  .box{max-width:900px;margin:auto}
+  .out{margin-top:15px;word-break:break-all}
 </style>
 </head>
 <body>
+<div class="box">
+  <h2>HTML kodni yoz → Real link ol</h2>
 
-<h2>Firebase Link Shortener Demo</h2>
-<input type="text" id="longUrl" placeholder="Uzun URLni kiriting">
-<button onclick="shorten()">Qisqartirish</button>
-<button onclick="copyLink()">Nusxalash</button>
+  <textarea id="htmlCode"><!DOCTYPE html>
+<html>
+<body>
+<h1>Salom!</h1>
+<p>Bu real GitHub Pages link.</p>
+</body>
+</html></textarea>
 
-<div id="result"></div>
+  <br><br>
+
+  <!-- SOZLAMALAR -->
+  <input id="token" placeholder="GitHub TOKEN" style="width:100%" />
+  <br><br>
+  <input id="repo" placeholder="Repo nomi" />
+  <input id="path" placeholder="index.html" value="index.html" />
+  <br><br>
+
+  <button onclick="upload()">Link yaratish</button>
+
+  <div class="out" id="result"></div>
+</div>
 
 <script>
-// 🔹 Firebase konfiguratsiyasi
-const firebaseConfig = {
-  apiKey: "AIzaSyA7VLHdjPqf_tobSiBczGbN8H7YlFwq9Wg",
-  authDomain: "magnetic-alloy-467611-u7.firebaseapp.com",
-  databaseURL: "https://magnetic-alloy-467611-u7-default-rtdb.firebaseio.com",
-  projectId: "magnetic-alloy-467611-u7",
-  storageBucket: "magnetic-alloy-467611-u7.appspot.com",
-  messagingSenderId: "589500919880",
-  appId: "1:589500919880:web:ec5667d52b78782c51687d",
-  measurementId: "G-KW75V0LKMB"
-};
+async function upload(){
+  const token = document.getElementById('token').value.trim();
+  const repo  = document.getElementById('repo').value.trim();
+  const path  = document.getElementById('path').value.trim();
+  const html  = document.getElementById('htmlCode').value;
 
-// Firebase init
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+  if(!token||!repo||!path){ alert("Hamma maydonlarni to‘ldir"); return; }
 
-let currentShort = "";
+  // GitHub token orqali foydalanuvchi username olish
+  const userRes = await fetch('https://api.github.com/user', {
+    headers: { Authorization: `token ${token}` }
+  });
+  if(!userRes.ok){ alert("Token xato yoki foydalanuvchi topilmadi"); return; }
+  const userData = await userRes.json();
+  const owner = userData.login;
 
-// 🔹 Random ID yaratish
-function randomId() {
-  return Math.random().toString(36).substring(2, 8);
-}
+  const api = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
 
-// 🔹 Qisqartirish funksiyasi
-function shorten() {
-  const longUrl = document.getElementById("longUrl").value.trim();
-  if(!longUrl) { alert("URL kiritilmadi!"); return; }
+  // oldingi fayl bo‘lsa sha olish
+  let sha = null;
+  const check = await fetch(api, { headers:{Authorization:`token ${token}`}});
+  if(check.ok){
+    const j = await check.json();
+    sha = j.sha;
+  }
 
-  const shortId = randomId();
-  db.ref("links/" + shortId).set({
-    url: longUrl,
-    clicks: 0
-  })
-  .then(() => console.log("Link saqlandi:", shortId))
-  .catch(err => console.error(err));
-
-  const shortUrl = window.location.href.split('?')[0] + "?id=" + shortId;
-  currentShort = shortId;
-
-  document.getElementById("result").innerHTML = `
-    <p>Qisqa link:</p>
-    <a href="#" onclick="openLink('${shortId}');return false;">${shortUrl}</a>
-  `;
-}
-
-// 🔹 Linkni ochish va click counter
-function openLink(shortId) {
-  db.ref("links/" + shortId).once("value")
-    .then(snapshot => {
-      const data = snapshot.val();
-      if(!data) { alert("Link topilmadi!"); return; }
-      db.ref("links/" + shortId + "/clicks").set(data.clicks + 1);
-      window.open(data.url, "_blank");
+  const res = await fetch(api,{
+    method:"PUT",
+    headers:{
+      "Authorization":`token ${token}`,
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      message: "upload via html tool",
+      content: btoa(unescape(encodeURIComponent(html))),
+      sha: sha
     })
-    .catch(err => console.error(err));
-}
+  });
 
-// 🔹 Nusxalash
-function copyLink() {
-  if(!currentShort) { alert("Avval link qisqartiring!"); return; }
-  const fakeLink = window.location.href.split('?')[0] + "?id=" + currentShort;
-  navigator.clipboard.writeText(fakeLink);
-  alert("Link nusxalandi ✅");
-}
+  const data = await res.json();
+  if(!res.ok){
+    document.getElementById('result').innerText = "Xato: " + (data.message||res.status);
+    return;
+  }
 
-// 🔹 Avtomatik redirect ?id=xxxx bo‘lsa
-window.onload = function() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-  if(id) { openLink(id); }
-};
+  const link = `https://${owner}.github.io/${repo}/${path}`;
+  document.getElementById('result').innerHTML =
+    `Tayyor link: <a href="${link}" target="_blank">${link}</a>
+     <br><button onclick="navigator.clipboard.writeText('${link}')">Nusxalash</button>`;
+}
 </script>
-
 </body>
 </html>
